@@ -42,7 +42,7 @@ jobs:
         id: step1
         run: |
           echo "step 1"
-          [ ${{ inputs.failed-job-1 }} -eq 1 ] && exit 1 || exit 0
+          [ ${{ inputs.failed-job-2 }} -eq 1 ] && exit 1 || exit 0
 
   final-job:
     needs: [first-job, second-job]
