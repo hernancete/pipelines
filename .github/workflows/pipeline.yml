@@ -2,7 +2,7 @@ name: Main Branch Push
 run-name: ${{ github.actor }} pushed new changes into main
 on:
   push:
-    branches: ["main"]
+    branches: ["main_______"]
 
 jobs:
   show-github-vars:

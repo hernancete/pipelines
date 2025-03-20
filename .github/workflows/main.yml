@@ -1,0 +1,62 @@
+name: main
+on:
+  # push:
+  #   branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      failed-job-1:
+        type: number
+        default: 0
+      failed-job-2:
+        type: number
+        default: 0
+
+jobs:
+
+  first-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        id: step1
+        run: |
+          echo "step 1"
+          [ ${{ inputs.failed-job-1 }} -eq 1 ] && exit 1
+
+      - name: step 2
+        id: step2
+        run: |
+          echo "step 2"
+          [ ${{ inputs.failed-job-1 }} -eq 2 ] && exit 1
+
+      - name: step 3
+        id: step3
+        run: |
+          echo "step 3"
+          [ ${{ inputs.failed-job-1 }} -eq 3 ] && exit 1
+
+  second-job:
+    needs: first-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        id: step1
+        run: |
+          echo "step 1"
+          [ ${{ inputs.failed-job-1 }} -eq 1 ] && exit 1
+
+  final-job:
+    needs: [first-job, second-job]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 2
+        id: step1
+        run: |
+          echo "step 1"
+
+      - name: step 2
+        id: step2
+        run: |
+          echo "needs.first-job.result = ${{ needs.first-job.result }}"
+          echo "needs.second-job.result = ${{ needs.second-job.result }}"
+          echo "job.result = ${{ job.status }}"
