@@ -1,62 +1,69 @@
-name: main
+name: Main Branch Push
+run-name: ${{ github.actor }} pushed new changes into main
 on:
-  # push:
-  #   branches: ["main"]
-  workflow_dispatch:
-    inputs:
-      failed-job-1:
-        type: number
-        default: 0
-      failed-job-2:
-        type: number
-        default: 0
+  push:
+    branches: ["main"]
 
 jobs:
+  unit-tests:
+    name: Unit Tests
+    uses: ./.github/workflows/unit-test.yml
+    with:
+      node-version: ${{ vars.NODE_VERSION }}
 
-  first-job:
+  deploy-develop:
+    needs: unit-tests
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - name: step 1
-        id: step1
+      - name: Setup node env
+        uses: ./.github/workflows/node-setup.yml
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+      - name: CDK deploy
+        id: cdk-deploy
         run: |
-          echo "step 1"
-          [ ${{ inputs.failed-job-1 }} -eq 1 ] && exit 1 || exit 0
+          echo "cdk deploy"
 
-      - name: step 2
-        id: step2
-        run: |
-          echo "step 2"
-          [ ${{ inputs.failed-job-1 }} -eq 2 ] && exit 1 || exit 0
+  acceptance-tests:
+    needs: deploy-develop
+    name: Acceptance Tests
+    uses: ./.github/workflows/acceptance-test.yml
+    with:
+      node-version: ${{ vars.NODE_VERSION }}
+    secrets: inherit
 
-      - name: step 3
-        id: step3
-        run: |
-          echo "step 3"
-          [ ${{ inputs.failed-job-1 }} -eq 3 ] && exit 1 || exit 0
-
-  second-job:
-    needs: first-job
-    runs-on: ubuntu-latest
+  notification-success:
+    name: Slack success notification
+    needs: [unit-tests, deploy-develop, acceptance-tests]
+    if: ${{ needs.unit-tests.result == 'success' && needs.deploy-develop.result == 'success' && needs.acceptance-tests.result == 'success' }}
     steps:
-      - name: step 1
-        id: step1
+      - name: Slack success notification
+        id: success-notif
         run: |
-          echo "step 1"
-          [ ${{ inputs.failed-job-2 }} -eq 1 ] && exit 1 || exit 0
+          echo "Notify successful run"
 
-  final-job:
-    needs: [first-job, second-job]
+  notification-failure:
+    name: Slack failure notification
+    needs: [unit-tests, deploy-develop, acceptance-tests]
+    if: ${{ needs.unit-tests.result == 'failure' || needs.deploy-develop.result == 'failure' || needs.acceptance-tests.result == 'failure' }}
+    steps:
+      - name: Slack failure notification
+        id: failure-notif
+        run: |
+          echo "Notify failure run"
+
+  show-job-status:
+    name: Show jobs exit status
+    needs: [unit-tests, deploy-develop, acceptance-tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: step 2
-        id: step1
+      - name: Show jobs exit status
+        id: show-job-status
         run: |
-          echo "needs.first-job.result = ${{ needs.first-job.result }}"
-          echo "needs.second-job.result = ${{ needs.second-job.result }}"
-          echo "job.result = ${{ job.status }}"
-
-      - name: step 2
-        id: step2
-        run: |
-          echo "Send notification to slack"
+          echo needs.unit-tests.result = ${{ needs.unit-tests.result }}
+          echo needs.deploy-develop.result = ${{ needs.deploy-develop.result }}
+          echo needs.acceptance-tests.result = ${{ needs.acceptance-tests.result }}

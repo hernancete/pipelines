@@ -1,0 +1,21 @@
+name: Acceptance Tests
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  acceptance-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup node env
+        uses: ./.github/workflows/node-setup.yml
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Run acceptance tests
+        id: run-acceptance-tests
+        run: |
+          echo "Running acceptance tests"

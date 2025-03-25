@@ -1,0 +1,21 @@
+name: Unit Tests
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup node env
+        uses: ./.github/workflows/node-setup.yml
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Run tests
+        id: run-tests
+        run: |
+          echo "Running tests"

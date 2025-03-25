@@ -1,0 +1,17 @@
+name: Node Setup Mock
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  node-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup node
+        id: node-setup
+        run: |
+          echo "Setup node with ${{ inputs.node-version }}"
