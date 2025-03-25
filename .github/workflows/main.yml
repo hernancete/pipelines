@@ -38,6 +38,7 @@ jobs:
   notification-success:
     name: Slack success notification
     needs: [unit-tests, deploy-develop, acceptance-tests]
+    runs-on: ubuntu-latest
     if: ${{ needs.unit-tests.result == 'success' && needs.deploy-develop.result == 'success' && needs.acceptance-tests.result == 'success' }}
     steps:
       - name: Slack success notification
@@ -48,6 +49,7 @@ jobs:
   notification-failure:
     name: Slack failure notification
     needs: [unit-tests, deploy-develop, acceptance-tests]
+    runs-on: ubuntu-latest
     if: ${{ needs.unit-tests.result == 'failure' || needs.deploy-develop.result == 'failure' || needs.acceptance-tests.result == 'failure' }}
     steps:
       - name: Slack failure notification
@@ -58,8 +60,8 @@ jobs:
   show-job-status:
     name: Show jobs exit status
     needs: [unit-tests, deploy-develop, acceptance-tests]
-    if: always()
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Show jobs exit status
         id: show-job-status
