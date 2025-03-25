@@ -11,10 +11,14 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup node env
         uses: ./.github/workflows/node-setup.yml
         with:
           node-version: ${{ inputs.node-version }}
+
       - name: Run tests
         id: run-tests
         run: |
