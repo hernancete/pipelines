@@ -18,14 +18,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup node env
-        uses: ./.github/workflows/node-setup.yml
-        with:
-          node-version: ${{ vars.NODE_VERSION }}
-
       - name: CDK deploy
         id: cdk-deploy
         run: |
