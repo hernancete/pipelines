@@ -9,8 +9,7 @@ jobs:
     name: Unit Tests
     uses: ./.github/workflows/unit-test.yml
     with:
-      # node-version: ${{ vars.NODE_VERSION }}
-      node-version: 20
+      node-version: ${{ vars.NODE_VERSION }}
 
   deploy-develop:
     needs: unit-tests
@@ -25,8 +24,7 @@ jobs:
       - name: Setup node env
         uses: ./.github/workflows/node-setup.yml
         with:
-          # node-version: ${{ vars.NODE_VERSION }}
-          node-version: 20
+          node-version: ${{ vars.NODE_VERSION }}
 
       - name: CDK deploy
         id: cdk-deploy
@@ -38,8 +36,7 @@ jobs:
     name: Acceptance Tests
     uses: ./.github/workflows/acceptance-test.yml
     with:
-      # node-version: ${{ vars.NODE_VERSION }}
-      node-version: 20
+      node-version: ${{ vars.NODE_VERSION }}
     secrets: inherit
 
   notification-success:
